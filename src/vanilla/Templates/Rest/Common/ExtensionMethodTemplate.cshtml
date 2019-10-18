@@ -87,13 +87,13 @@ foreach (ParameterCs parameter in Model.LocalParameters)
     {
         if (Model.ReturnType.Body.IsPrimaryType(KnownPrimaryType.Stream))
         {
-    @:var _result = await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs("null"))).ConfigureAwait(false);
+    @:var _result = await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false);
     @:_result.Request.Dispose();
     @:return _result.Body;
         }
         else
         {
-    @:using (var _result = await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs("null"))).ConfigureAwait(false))
+    @:using (var _result = await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false))
     @:{
     @:    return _result.Body;
     @:}
@@ -101,14 +101,14 @@ foreach (ParameterCs parameter in Model.LocalParameters)
     }
     else if (Model.ReturnType.Headers != null)
     {
-    @:using (var _result = await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs("null"))).ConfigureAwait(false))
+    @:using (var _result = await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false))
     @:{
     @:    return _result.Headers;
     @:}
     }
     else
     {
-    @:(await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs("null"))).ConfigureAwait(false)).Dispose();
+    @:(await operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false)).Dispose();
     }
 @:}
 
@@ -146,7 +146,7 @@ foreach (ParameterCs parameter in Model.LocalParameters)
 @(Model.GetObsoleteAttribute())
 @:@((Model as MethodCs).AccessModifier) static @Model.OperationResponseReturnTypeString @(Model.Name)WithHttpMessages(@Model.GetExtensionParameters(Model.GetSyncMethodParameterDeclaration(true)))
 @:{
-@:    return operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs("customHeaders", "System.Threading.CancellationToken.None"))).ConfigureAwait(false).GetAwaiter().GetResult();
+@:    return operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false).GetAwaiter().GetResult();
 @:}
 @:
     }

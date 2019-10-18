@@ -68,5 +68,8 @@ namespace AutoRest.CSharp.Model
         /// </summary>
         public override IEnumerable<string> MyReservedNames
             => base.MyReservedNames.ConcatSingleItem(Namespace.Else("").Substring(Namespace.Else("").LastIndexOf('.') + 1)).Where( each => !each.IsNullOrEmpty());
+
+        public string ClientName => Namespace.Split('.')[1] + "Client";
+
     }
 }

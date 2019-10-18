@@ -18,6 +18,7 @@ using static AutoRest.Core.Utilities.DependencyInjection;
 using AutoRest.Extensions;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Razor.CodeGenerators;
 
 namespace AutoRest.CSharp
 {
@@ -60,7 +61,7 @@ namespace AutoRest.CSharp
         protected virtual async Task GenerateClientSideCode(CodeModelCs codeModel)
         {
             await GenerateServiceClient<ServiceClientTemplate>(codeModel);
-            await GenerateOperations<MethodGroupTemplate>(codeModel.Operations);
+            //await GenerateOperations<MethodGroupTemplate>(codeModel.Operations);
             await GenerateModels(codeModel.ModelTypes.Union(codeModel.HeaderTypes));
             await GenerateEnums(codeModel.EnumTypes);
             await GenerateExceptions(codeModel.ErrorTypes);
@@ -72,9 +73,9 @@ namespace AutoRest.CSharp
 
         protected virtual async Task GenerateServiceClient<T>(CodeModelCs codeModel) where T : Template<CodeModelCs>, new()
         {
-            await Write(new T { Model = codeModel }, $"{GeneratedSourcesBaseFolder}{codeModel.Name}{ImplementationFileExtension}");
-            await Write(new ServiceClientInterfaceTemplate { Model = codeModel }, $"{GeneratedSourcesBaseFolder}I{codeModel.Name}{ImplementationFileExtension}");
-        }
+			await Write(new T { Model = codeModel }, $"{GeneratedSourcesBaseFolder}Api\\{codeModel.ClientName}{ImplementationFileExtension}");
+			//await Write(new ServiceClientInterfaceTemplate { Model = codeModel }, $"{GeneratedSourcesBaseFolder}I{codeModel.Name}{ImplementationFileExtension}");
+		}
 
         protected virtual async Task GenerateOperations<T>(IEnumerable<MethodGroup> modelTypes) where T : Template<MethodGroupCs>, new()
         {

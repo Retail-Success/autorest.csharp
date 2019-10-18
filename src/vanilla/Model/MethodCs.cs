@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using AutoRest.Core.Model;
 using AutoRest.Core.Utilities;
 using AutoRest.Extensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 
 namespace AutoRest.CSharp.Model
@@ -84,12 +85,6 @@ namespace AutoRest.CSharp.Model
         {
             var declarations = this.GetSyncMethodParameterDeclaration(addCustomHeaderParameters);
 
-            if (!string.IsNullOrEmpty(declarations))
-            {
-                declarations += ", ";
-            }
-            declarations += "System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)";
-
             return declarations;
         }
 
@@ -101,8 +96,8 @@ namespace AutoRest.CSharp.Model
         /// <summary>
         /// Get the invocation args for an invocation with an async method
         /// </summary>
-        public string GetAsyncMethodInvocationArgs(string customHeaderReference, string cancellationTokenReference = "cancellationToken") => 
-            string.Join(", ", LocalParameters.Select(each => (string)each.Name).Concat(new[] { customHeaderReference, cancellationTokenReference }));
+        public string GetAsyncMethodInvocationArgs() => 
+            string.Join(", ", LocalParameters.Select(each => (string)each.Name));
 
         /// <summary>
         /// Get the parameters that are actually method parameters in the order they appear in the method signature
@@ -132,18 +127,18 @@ namespace AutoRest.CSharp.Model
             {
                 if (ReturnType.Body != null && ReturnType.Headers != null)
                 {
-                    return $"Microsoft.Rest.HttpOperationResponse<{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)},{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}>";
+                    return $"Result<{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)},{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}, ErrorResult>";
                 }
                 if (ReturnType.Body != null)
                 {
-                    return $"Microsoft.Rest.HttpOperationResponse<{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)}>";
+                    return $"Result<{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)}, ErrorResult>";
                 }
                 if (ReturnType.Headers != null)
                 {
-                    return $"Microsoft.Rest.HttpOperationHeaderResponse<{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}>";
+                    return $"Result<{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}, ErrorResult>";
                 }
 
-                return "Microsoft.Rest.HttpOperationResponse";
+                return "Result<Ok, ErrorResult>";
 
             }
         }
@@ -335,11 +330,7 @@ namespace AutoRest.CSharp.Model
 
             foreach (var pathParameter in this.LogicalParameters.Where(p => p.Location == ParameterLocation.Path))
             {
-                string replaceString = "{0} = {0}.Replace(\"{{{1}}}\", System.Uri.EscapeDataString({2}));";
-                if (pathParameter.SkipUrlEncoding())
-                {
-                    replaceString = "{0} = {0}.Replace(\"{{{1}}}\", {2});";
-                }
+                string replaceString = "requestUri.ReplaceUrlSegment(\"{{{1}}}\", {2});";
                 var urlPathName = pathParameter.SerializedName;
                 if (pathParameter.ModelType is SequenceType)
                 {
@@ -353,25 +344,14 @@ namespace AutoRest.CSharp.Model
                     builder.AppendLine(replaceString,
                     variableName,
                     urlPathName,
-                    pathParameter.ModelType.ToString(ClientReference, pathParameter.Name));
+                    pathParameter.Name);
                 }
             }
             if (this.LogicalParameters.Any(p => p.Location == ParameterLocation.Query))
             {
-                builder.AppendLine("System.Collections.Generic.List<string> _queryParameters = new System.Collections.Generic.List<string>();");
                 foreach (var queryParameter in this.LogicalParameters.Where(p => p.Location == ParameterLocation.Query))
                 {
-                    var replaceString = "_queryParameters.Add(string.Format(\"{0}={{0}}\", System.Uri.EscapeDataString({1})));";
-                    if ((queryParameter as ParameterCs).IsNullable())
-                    {
-                        builder.AppendLine("if ({0} != null)", queryParameter.Name)
-                            .AppendLine("{").Indent();
-                    }
-
-                    if (queryParameter.SkipUrlEncoding())
-                    {
-                        replaceString = "_queryParameters.Add(string.Format(\"{0}={{0}}\", {1}));";
-                    }
+                    var replaceString = "requestUri.AddQueryParameter(\"{0}\", {1});";
 
                     if (queryParameter.CollectionFormat == CollectionFormat.Multi)
                     {
@@ -392,26 +372,7 @@ namespace AutoRest.CSharp.Model
                         builder.AppendLine(replaceString,
                                 queryParameter.SerializedName, queryParameter.GetFormattedReferenceValue(ClientReference));
                     }
-
-                    if ((queryParameter as ParameterCs).IsNullable())
-                    {
-                        builder.Outdent()
-                            .AppendLine("}");
-                    }
                 }
-
-                builder.AppendLine("if (_queryParameters.Count > 0)")
-                    .AppendLine("{").Indent();
-                if (this.Extensions.ContainsKey("nextLinkMethod") && (bool)this.Extensions["nextLinkMethod"])
-                {
-                    builder.AppendLine("{0} += ({0}.Contains(\"?\") ? \"&\" : \"?\") + string.Join(\"&\", _queryParameters);", variableName);
-                }
-                else
-                {
-                    builder.AppendLine("{0} += \"?\" + string.Join(\"&\", _queryParameters);", variableName);
-                }
-
-                builder.Outdent().AppendLine("}");
             }
 
             return builder.ToString();
@@ -481,5 +442,26 @@ namespace AutoRest.CSharp.Model
                     .Where(m => m.InputParameter.IsNullable())
                     .Select(m => m.InputParameter.Name + " != null"));
         }
+
+        public object GetHttpMethod(HttpMethod httpMethod)
+        {
+	        var genericType = string.Empty;
+	        if (ReturnTypeString != "void")
+	        {
+		        genericType = $"<{ReturnTypeString}>";
+	        }
+
+	        switch (httpMethod)
+	        {
+		        case HttpMethod.Get: return $"GetAsync{genericType}";
+		        case HttpMethod.Post: return $"PostAsync{genericType}";
+		        case HttpMethod.Delete: return $"DeleteAsync{genericType}";
+		        default:
+			        throw new ArgumentException($"HttpMethod: {httpMethod} is not supported.");
+	        }
+        }
+
+        public string RequiredScope => Extensions.GetValue<string>("x-required-scope");
+
     }
 }

@@ -66,7 +66,7 @@ namespace AutoRest.Simplify
                     var names = new GetQualifiedNames().GetNames(newRoot).Where( each => ! skipNamespace.Any( ns => ns == each )).ToArray();
 
                     // add the usings that we found
-                    newRoot = new AddUsingsRewriter(names).Visit(newRoot);
+                    //newRoot = new AddUsingsRewriter(names).Visit(newRoot); // this adds extra using statements to our code, so we are not going to run it
 
                     // tell roslyn to simplify where it can
                     newRoot = new SimplifyNamesRewriter().Visit(newRoot);
