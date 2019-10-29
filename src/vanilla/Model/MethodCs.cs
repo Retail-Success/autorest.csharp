@@ -443,7 +443,7 @@ namespace AutoRest.CSharp.Model
                     .Select(m => m.InputParameter.Name + " != null"));
         }
 
-        public object GetHttpMethod(HttpMethod httpMethod)
+        public string GetHttpMethod(HttpMethod httpMethod)
         {
 	        var genericType = string.Empty;
 	        if (ReturnTypeString != "void")
@@ -454,7 +454,11 @@ namespace AutoRest.CSharp.Model
 	        switch (httpMethod)
 	        {
 		        case HttpMethod.Get: return $"GetAsync{genericType}";
-		        case HttpMethod.Post: return $"PostAsync{genericType}";
+                case HttpMethod.Post:
+                    var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
+                    // if we have a post with nothing being passed in the body, we are going to pass null to PostAsync in GetPostParameter,
+                    //   so the type needs to be specified
+                    return bodyParameter == null ? $"PostAsync<string>" : $"PostAsync{genericType}";
 		        case HttpMethod.Delete: return $"DeleteAsync{genericType}";
 		        default:
 			        throw new ArgumentException($"HttpMethod: {httpMethod} is not supported.");
@@ -462,6 +466,13 @@ namespace AutoRest.CSharp.Model
         }
 
         public string RequiredScope => Extensions.GetValue<string>("x-required-scope");
+        public string CorrectedName => Regex.Replace(Name, "V([0-9]+)$", "");
 
+        public string GetPostParameter(HttpMethod httpMethod)
+        {
+            if (httpMethod != HttpMethod.Post) return string.Empty;
+            var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
+            return bodyParameter == null ? ", null" : $", {bodyParameter.Name}";
+        }
     }
 }

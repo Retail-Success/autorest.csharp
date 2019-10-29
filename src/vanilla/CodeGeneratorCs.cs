@@ -18,7 +18,6 @@ using static AutoRest.Core.Utilities.DependencyInjection;
 using AutoRest.Extensions;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using Microsoft.AspNetCore.Razor.CodeGenerators;
 
 namespace AutoRest.CSharp
 {

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -70,6 +71,6 @@ namespace AutoRest.CSharp.Model
             => base.MyReservedNames.ConcatSingleItem(Namespace.Else("").Substring(Namespace.Else("").LastIndexOf('.') + 1)).Where( each => !each.IsNullOrEmpty());
 
         public string ClientName => Namespace.Split('.')[1] + "Client";
-
+        public IEnumerable<Method> FilteredMethods => Methods.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
     }
 }
