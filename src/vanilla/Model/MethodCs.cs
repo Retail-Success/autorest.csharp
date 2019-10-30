@@ -459,7 +459,7 @@ namespace AutoRest.CSharp.Model
                     var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
                     // if we have a post with nothing being passed in the body, we are going to pass null to PostAsync in GetPostParameter,
                     //   so the type needs to be specified
-                    return bodyParameter == null ? $"PostAsync<string, {ResponseReturnTypeString}>" : $"PostAsync<{ReturnTypeString}, {ResponseReturnTypeString}>";
+                    return bodyParameter == null ? $"PostAsync<string, {ResponseReturnTypeString}>" : $"PostAsync<{bodyParameter.ModelTypeName}, {ResponseReturnTypeString}>";
 		        case HttpMethod.Delete: return $"DeleteAsync{genericType}";
 		        default:
 			        throw new ArgumentException($"HttpMethod: {httpMethod} is not supported.");
@@ -467,7 +467,7 @@ namespace AutoRest.CSharp.Model
         }
 
         public string RequiredScope => Extensions.GetValue<string>("x-required-scope");
-        public string CorrectedName => Regex.Replace(Name, "V([0-9]+)$", "");
+        public string CorrectedName => Regex.Replace(Name, "V([0-9]+)$", "").TrimEnd('1');
 
         public string GetPostParameter(HttpMethod httpMethod)
         {

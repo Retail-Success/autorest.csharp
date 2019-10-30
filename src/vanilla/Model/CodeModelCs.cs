@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AutoRest.Core.Model;
 using AutoRest.Core.Utilities;
 using AutoRest.Core.Utilities.Collections;
@@ -71,6 +72,18 @@ namespace AutoRest.CSharp.Model
             => base.MyReservedNames.ConcatSingleItem(Namespace.Else("").Substring(Namespace.Else("").LastIndexOf('.') + 1)).Where( each => !each.IsNullOrEmpty());
 
         public string ClientName => Namespace.Split('.')[1] + "Client";
-        public IEnumerable<Method> FilteredMethods => Methods.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
+
+        public IEnumerable<Method> FilteredMethods
+        {
+            get
+            {
+                var versionedRoutes = Methods.Where(m => Regex.IsMatch(m.Url, "^/v([0-9]+.[0-9]+)")).ToList();
+                if (versionedRoutes.Any())
+                {
+                    return versionedRoutes;
+                }
+                return Methods.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
+            }
+        }
     }
 }
