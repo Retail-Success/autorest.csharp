@@ -121,25 +121,26 @@ namespace AutoRest.CSharp.Model
         /// <summary>
         /// Get the return type name for the underlying interface method
         /// </summary>
-        public virtual string OperationResponseReturnTypeString
+        public virtual string OperationResponseReturnTypeString => $"Result<{ResponseReturnTypeString}, ErrorResult>";
+
+        private string ResponseReturnTypeString
         {
             get
             {
                 if (ReturnType.Body != null && ReturnType.Headers != null)
                 {
-                    return $"Result<{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)},{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}, ErrorResult>";
+                    return $"{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)},{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}";
                 }
                 if (ReturnType.Body != null)
                 {
-                    return $"Result<{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)}, ErrorResult>";
+                    return ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType);
                 }
                 if (ReturnType.Headers != null)
                 {
-                    return $"Result<{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}, ErrorResult>";
+                    return ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head);
                 }
 
-                return "Result<Ok, ErrorResult>";
-
+                return "Ok";
             }
         }
 
@@ -449,7 +450,7 @@ namespace AutoRest.CSharp.Model
 	        if (ReturnTypeString != "void")
 	        {
 		        genericType = $"<{ReturnTypeString}>";
-	        }
+            }
 
 	        switch (httpMethod)
 	        {
@@ -458,7 +459,7 @@ namespace AutoRest.CSharp.Model
                     var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
                     // if we have a post with nothing being passed in the body, we are going to pass null to PostAsync in GetPostParameter,
                     //   so the type needs to be specified
-                    return bodyParameter == null ? $"PostAsync<string>" : $"PostAsync{genericType}";
+                    return bodyParameter == null ? $"PostAsync<string, {ResponseReturnTypeString}>" : $"PostAsync<{ReturnTypeString}, {ResponseReturnTypeString}>";
 		        case HttpMethod.Delete: return $"DeleteAsync{genericType}";
 		        default:
 			        throw new ArgumentException($"HttpMethod: {httpMethod} is not supported.");
