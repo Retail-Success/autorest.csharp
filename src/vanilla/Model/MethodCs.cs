@@ -452,14 +452,19 @@ namespace AutoRest.CSharp.Model
 		        genericType = $"<{ReturnTypeString}>";
             }
 
-	        switch (httpMethod)
+            var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
+
+            switch (httpMethod)
 	        {
 		        case HttpMethod.Get: return $"GetAsync{genericType}";
                 case HttpMethod.Post:
-                    var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
                     // if we have a post with nothing being passed in the body, we are going to pass null to PostAsync in GetPostParameter,
                     //   so the type needs to be specified
                     return bodyParameter == null ? $"PostAsync<string, {ResponseReturnTypeString}>" : $"PostAsync<{bodyParameter.ModelTypeName}, {ResponseReturnTypeString}>";
+                case HttpMethod.Put:
+                    // if we have a post with nothing being passed in the body, we are going to pass null to PutAsync in GetPostParameter,
+                    //   so the type needs to be specified
+                    return bodyParameter == null ? $"PutAsync<string, {ResponseReturnTypeString}>" : $"PutAsync<{bodyParameter.ModelTypeName}, {ResponseReturnTypeString}>";
 		        case HttpMethod.Delete: return $"DeleteAsync{genericType}";
 		        default:
 			        throw new ArgumentException($"HttpMethod: {httpMethod} is not supported.");
@@ -471,7 +476,7 @@ namespace AutoRest.CSharp.Model
 
         public string GetPostParameter(HttpMethod httpMethod)
         {
-            if (httpMethod != HttpMethod.Post) return string.Empty;
+            if (httpMethod != HttpMethod.Post && httpMethod != HttpMethod.Put) return string.Empty;
             var bodyParameter = LocalParameters.SingleOrDefault(p => p.Location == ParameterLocation.Body);
             return bodyParameter == null ? ", null" : $", {bodyParameter.Name}";
         }
