@@ -265,33 +265,7 @@ namespace AutoRest.CSharp
         /// <returns></returns>
         public static string ToString(this IModelType type, string clientReference, string reference)
         {
-            if (type == null || type.IsKindOfString() )
-            {
-                return reference;
-            }
-
-            string serializationSettings = $"{clientReference}.SerializationSettings";
-            if (type is PrimaryType primaryType)
-            {
-                if (primaryType.KnownPrimaryType == KnownPrimaryType.Date)
-                {
-                    serializationSettings = "new Microsoft.Rest.Serialization.DateJsonConverter()";
-                }
-                else if (primaryType.KnownPrimaryType == KnownPrimaryType.DateTimeRfc1123)
-                {
-                    serializationSettings = "new Microsoft.Rest.Serialization.DateTimeRfc1123JsonConverter()";
-                }
-                else if (primaryType.KnownPrimaryType == KnownPrimaryType.Base64Url)
-                {
-                    serializationSettings = "new Microsoft.Rest.Serialization.Base64UrlJsonConverter()";
-                }
-                else if (primaryType.KnownPrimaryType == KnownPrimaryType.UnixTime)
-                {
-                    serializationSettings = "new Microsoft.Rest.Serialization.UnixTimeJsonConverter()";
-                }
-            }
-
-            return $"Microsoft.Rest.Serialization.SafeJsonConvert.SerializeObject({reference}, {serializationSettings}).Trim('\"')";
+            return reference;
         }
 
         /// <summary>

@@ -77,12 +77,13 @@ namespace AutoRest.CSharp.Model
         {
             get
             {
-                var versionedRoutes = Methods.Where(m => Regex.IsMatch(m.Url, "^/v([0-9]+.[0-9]+)")).ToList();
+                var nonDeprecatedMethods = Methods.Where(m => !m.Deprecated).ToList();
+                var versionedRoutes = nonDeprecatedMethods.Where(m => Regex.IsMatch(m.Url, "^/v([0-9]+.[0-9]+)")).ToList();
                 if (versionedRoutes.Any())
                 {
                     return versionedRoutes;
                 }
-                return Methods.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
+                return nonDeprecatedMethods.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
             }
         }
     }
