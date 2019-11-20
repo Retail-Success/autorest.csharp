@@ -59,8 +59,36 @@ namespace AutoRest.CSharp
 
         protected virtual async Task GenerateClientSideCode(CodeModelCs codeModel)
         {
-            await GenerateServiceClient<ServiceClientTemplate>(codeModel);
-            //await GenerateOperations<MethodGroupTemplate>(codeModel.Operations);
+            var mainClientName = codeModel.Namespace.Split('.')[1];
+
+            var clientNames = codeModel.Methods
+                .Select(m => (MethodCs)m)
+                .Select(m => m.ClientName)
+                .Distinct()
+                .Where(n => !string.IsNullOrWhiteSpace(n) && codeModel.GetFilteredMethods(n + "Client").Any())
+                .ToList();
+            if (clientNames.Count == 0)
+            {
+                clientNames = new List<string>
+                {
+                    mainClientName
+                };
+                codeModel.FilterMethodsByClientName = false;
+            }
+            else
+            {
+                await GenerateMainClient(new MainClientType
+                {
+                    MainClientName = mainClientName + "Client",
+                    ClientNames = clientNames
+                });
+            }
+            foreach (var clientName in clientNames)
+            {
+                codeModel.ClientName = clientName + "Client";
+                await GenerateServiceClient<ServiceClientTemplate>(codeModel);
+                //await GenerateOperations<MethodGroupTemplate>(codeModel.Operations);
+            }
             await GenerateModels(codeModel.ModelTypes.Union(codeModel.HeaderTypes));
             await GenerateEnums(codeModel.EnumTypes);
             await GenerateExceptions(codeModel.ErrorTypes);
@@ -97,6 +125,11 @@ namespace AutoRest.CSharp
                 await Write(new ExtensionsTemplate { Model = methodGroup },
                     $"{GeneratedSourcesBaseFolder}{methodGroup.ExtensionTypeName}Extensions{ImplementationFileExtension}");
             }
+        }
+
+        protected virtual async Task GenerateMainClient(MainClientType model)
+        {
+            await Write(new MainClientTemplate {Model = model}, $"{GeneratedSourcesBaseFolder}Api\\{model.MainClientName}{ImplementationFileExtension}");
         }
 
         protected virtual async Task GenerateModels(IEnumerable<CompositeType> modelTypes)

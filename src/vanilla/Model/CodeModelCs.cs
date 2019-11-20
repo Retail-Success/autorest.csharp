@@ -15,6 +15,12 @@ using static AutoRest.Core.Utilities.DependencyInjection;
 
 namespace AutoRest.CSharp.Model
 {
+    public class MainClientType : CodeModel
+    {
+        public string MainClientName { get; set; }
+        public IList<string> ClientNames { get; set; }
+    }
+
     public class CodeModelCs : CodeModel
     {
         [JsonIgnore]
@@ -71,20 +77,28 @@ namespace AutoRest.CSharp.Model
         public override IEnumerable<string> MyReservedNames
             => base.MyReservedNames.ConcatSingleItem(Namespace.Else("").Substring(Namespace.Else("").LastIndexOf('.') + 1)).Where( each => !each.IsNullOrEmpty());
 
-        public string ClientName => Namespace.Split('.')[1] + "Client";
+        public string ClientName { get; set; }
 
-        public IEnumerable<Method> FilteredMethods
+        public bool FilterMethodsByClientName { get; set; } = true;
+
+        public IEnumerable<Method> FilteredMethods => GetFilteredMethods(ClientName);
+
+        public IEnumerable<Method> GetFilteredMethods(string clientName)
         {
-            get
+            var nonDeprecatedMethodsByClientName = Methods
+                .Select(m => (MethodCs)m)
+                .Where(m =>
             {
-                var nonDeprecatedMethods = Methods.Where(m => !m.Deprecated).ToList();
-                var versionedRoutes = nonDeprecatedMethods.Where(m => Regex.IsMatch(m.Url, "^/v([0-9]+.[0-9]+)")).ToList();
-                if (versionedRoutes.Any())
-                {
-                    return versionedRoutes;
-                }
-                return nonDeprecatedMethods.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
+                var matchesClientName = !FilterMethodsByClientName || (m.ClientName + "Client").Equals(clientName);
+                return !m.Deprecated && matchesClientName;
+            }).ToList();
+            var versionedRoutes = nonDeprecatedMethodsByClientName.Where(m => Regex.IsMatch(m.Url, "^/v([0-9]+.[0-9]+)")).ToList();
+            if (versionedRoutes.Any())
+            {
+                return versionedRoutes;
             }
+            return nonDeprecatedMethodsByClientName.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
+
         }
     }
 }

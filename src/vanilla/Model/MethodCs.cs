@@ -473,6 +473,8 @@ namespace AutoRest.CSharp.Model
 
         public string RequiredScope => Extensions.GetValue<string>("x-required-scope");
         public string CorrectedName => Regex.Replace(Name, "V([0-9]+)$", "").TrimEnd('1');
+        public string ClientName => Extensions.GetValue<string>("x-client-name");
+
 
         public string GetPostParameter(HttpMethod httpMethod)
         {
