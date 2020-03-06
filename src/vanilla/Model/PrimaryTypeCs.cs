@@ -54,7 +54,7 @@ namespace AutoRest.CSharp.Model
                         return "System.DateTime";
 
                     case KnownPrimaryType.Double:
-                        return "double";
+                        return "decimal";
 
                     case KnownPrimaryType.Decimal:
                         return "decimal";

@@ -34,7 +34,7 @@ if (Model.SyncMethods == SyncMethodsGenerationMode.All || Model.SyncMethods == S
 @:/// </param>
     }
 @(Model.GetObsoleteAttribute())
-@:@((Model as MethodCs).AccessModifier) static @Model.ReturnTypeString @(Model.Name)(@Model.GetExtensionParameters(Model.GetSyncMethodParameterDeclaration(false)))
+@:@((Model as MethodCs).AccessModifier) static @Model.ReturnTypeString @(Model.Name)(@Model.GetExtensionParameters(Model.GetSyncMethodParameterDeclaration(false, false)))
 @:{
     if (Model.ReturnType.Body != null)
     {
@@ -81,7 +81,7 @@ foreach (ParameterCs parameter in Model.LocalParameters)
 @:/// The cancellation token.
 @:/// </param>
 @(Model.GetObsoleteAttribute())
-@:@((Model as MethodCs).AccessModifier) static async @Model.TaskExtensionReturnTypeString @(Model.Name)Async(@Model.GetExtensionParameters(Model.GetAsyncMethodParameterDeclaration()))
+@:@((Model as MethodCs).AccessModifier) static async @Model.TaskExtensionReturnTypeString @(Model.Name)Async(@Model.GetExtensionParameters(Model.GetAsyncMethodParameterDeclaration(true, false)))
 @:{
     if (Model.ReturnType.Body != null)
     {
@@ -144,7 +144,7 @@ foreach (ParameterCs parameter in Model.LocalParameters)
 @:/// Headers that will be added to request.
 @:/// </param>
 @(Model.GetObsoleteAttribute())
-@:@((Model as MethodCs).AccessModifier) static @Model.OperationResponseReturnTypeString @(Model.Name)WithHttpMessages(@Model.GetExtensionParameters(Model.GetSyncMethodParameterDeclaration(true)))
+@:@((Model as MethodCs).AccessModifier) static @Model.OperationResponseReturnTypeString @(Model.Name)WithHttpMessages(@Model.GetExtensionParameters(Model.GetSyncMethodParameterDeclaration(true, false)))
 @:{
 @:    return operations.@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false).GetAwaiter().GetResult();
 @:}

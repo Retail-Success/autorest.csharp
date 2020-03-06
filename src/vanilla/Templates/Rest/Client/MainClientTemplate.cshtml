@@ -7,7 +7,7 @@ namespace @(Settings.Namespace).Api
     using System.Net.Http;
     using RetailSuccess.Extensions.ApiClients.Abstractions;
 
-    public class @Model.MainClientName : ClientBase
+    public class @Model.MainClientName : ClientBase, I@(Model.MainClientName)
     {
 
         public @(Model.MainClientName)(TokenProvider tokenProvider, HttpClient httpClient)

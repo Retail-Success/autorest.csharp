@@ -1,0 +1,18 @@
+@using AutoRest.Core.Model
+@inherits AutoRest.Core.Template<AutoRest.CSharp.Model.MainClientType>
+@Header("// ")
+@EmptyLine
+namespace @(Settings.Namespace).Api
+{
+    using System.Net.Http;
+    using RetailSuccess.Extensions.ApiClients.Abstractions;
+
+    public interface I@(Model.MainClientName)
+    {
+    @EmptyLine
+    @foreach (var clientName in Model.ClientNames)
+    {
+        @:@(clientName)Client @(clientName) { get; }
+    }
+    }
+}

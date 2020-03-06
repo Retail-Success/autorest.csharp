@@ -49,16 +49,11 @@ namespace AutoRest.CSharp.Model
         }
 
         /// <summary>
-        /// Generate the method parameter declaration for async methods and extensions
-        /// </summary>
-        public virtual string GetAsyncMethodParameterDeclaration() => GetAsyncMethodParameterDeclaration(false);
-
-        /// <summary>
         /// Generate the method parameter declaration for sync methods and extensions
         /// </summary>
         /// <param name="addCustomHeaderParameters">If true add the customHeader to the parameters</param>
         /// <returns>Generated string of parameters</returns>
-        public virtual string GetSyncMethodParameterDeclaration(bool addCustomHeaderParameters)
+        public virtual string GetSyncMethodParameterDeclaration(bool addCustomHeaderParameters, bool addCancellationToken)
         {
             List<string> declarations = new List<string>();
             foreach (var parameter in LocalParameters)
@@ -73,6 +68,11 @@ namespace AutoRest.CSharp.Model
                 declarations.Add("System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<string>> customHeaders = null");
             }
 
+            if (addCancellationToken)
+            {
+                declarations.Add("CancellationToken cancellationToken = default");
+            }
+
             return string.Join(", ", declarations);
         }
 
@@ -81,9 +81,9 @@ namespace AutoRest.CSharp.Model
         /// </summary>
         /// <param name="addCustomHeaderParameters">If true add the customHeader to the parameters</param>
         /// <returns>Generated string of parameters</returns>
-        public virtual string GetAsyncMethodParameterDeclaration(bool addCustomHeaderParameters)
+        public virtual string GetAsyncMethodParameterDeclaration(bool addCustomHeaderParameters, bool addCancellationToken)
         {
-            var declarations = this.GetSyncMethodParameterDeclaration(addCustomHeaderParameters);
+            var declarations = this.GetSyncMethodParameterDeclaration(addCustomHeaderParameters, addCancellationToken);
 
             return declarations;
         }
@@ -356,17 +356,8 @@ namespace AutoRest.CSharp.Model
 
                     if (queryParameter.CollectionFormat == CollectionFormat.Multi)
                     {
-                        builder.AppendLine("if ({0}.Count == 0)", queryParameter.Name)
-                           .AppendLine("{").Indent()
-                           .AppendLine(replaceString, queryParameter.SerializedName, "string.Empty").Outdent()
-                           .AppendLine("}")
-                           .AppendLine("else")
-                           .AppendLine("{").Indent()
-                           .AppendLine("foreach (var _item in {0})", queryParameter.Name)
-                           .AppendLine("{").Indent()
-                           .AppendLine(replaceString, queryParameter.SerializedName, "\"\" + _item").Outdent()
-                           .AppendLine("}").Outdent()
-                           .AppendLine("}").Outdent();
+                        builder.AppendLine(replaceString,
+                            queryParameter.SerializedName, queryParameter.Name);
                     }
                     else
                     {

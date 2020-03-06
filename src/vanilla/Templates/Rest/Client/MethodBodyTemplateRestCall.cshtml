@@ -2,5 +2,5 @@
 
 var requestUri = new RequestUri("@(Model.Url)");
 @(Model.BuildUrl("requestUri"))
-return await @(Model.GetHttpMethod(Model.HttpMethod))(requestUri@(Model.GetPostParameter(Model.HttpMethod)), new []{ "@(Model.RequiredScope)" });
+return await @(Model.GetHttpMethod(Model.HttpMethod))(requestUri@(Model.GetPostParameter(Model.HttpMethod)), new []{ "@(Model.RequiredScope)" }, cancellationToken);
 

@@ -10,13 +10,14 @@ namespace @(Settings.Namespace).Api
 	using System;
 	using System.Collections.Generic;
 	using System.Net.Http;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using RetailSuccess.Extensions.ApiClients.Abstractions;
 	using RetailSuccess.SDK.Core;
 	using RetailSuccess.SDK.Core.Models;
 	using @(Settings.Namespace).Models;
-@EmptyLine
-	public class @Model.ClientName : ClientBase
+	@EmptyLine
+	public class @Model.ClientName : ClientBase, I@(Model.ClientName)
 	{
 	@(Include(new ServiceClientBodyTemplate(), Model))
 
@@ -27,4 +28,4 @@ namespace @(Settings.Namespace).Api
 		@:
 	}
 	}
-}
+	}

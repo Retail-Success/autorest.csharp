@@ -59,7 +59,8 @@ namespace AutoRest.CSharp
 
         protected virtual async Task GenerateClientSideCode(CodeModelCs codeModel)
         {
-            var mainClientName = codeModel.Namespace.Split('.')[1];
+            var parts = codeModel.Namespace.Split('.');
+            var mainClientName = string.Join("", parts.Skip(1).Take(parts.Length - 2));
 
             var clientNames = codeModel.Methods
                 .Select(m => (MethodCs)m)
@@ -101,7 +102,7 @@ namespace AutoRest.CSharp
         protected virtual async Task GenerateServiceClient<T>(CodeModelCs codeModel) where T : Template<CodeModelCs>, new()
         {
 			await Write(new T { Model = codeModel }, $"{GeneratedSourcesBaseFolder}Api\\{codeModel.ClientName}{ImplementationFileExtension}");
-			//await Write(new ServiceClientInterfaceTemplate { Model = codeModel }, $"{GeneratedSourcesBaseFolder}I{codeModel.Name}{ImplementationFileExtension}");
+			await Write(new ServiceClientInterfaceTemplate { Model = codeModel }, $"{GeneratedSourcesBaseFolder}Api\\I{codeModel.ClientName}{ImplementationFileExtension}");
 		}
 
         protected virtual async Task GenerateOperations<T>(IEnumerable<MethodGroup> modelTypes) where T : Template<MethodGroupCs>, new()
@@ -130,6 +131,7 @@ namespace AutoRest.CSharp
         protected virtual async Task GenerateMainClient(MainClientType model)
         {
             await Write(new MainClientTemplate {Model = model}, $"{GeneratedSourcesBaseFolder}Api\\{model.MainClientName}{ImplementationFileExtension}");
+            await Write(new MainClientInterfaceTemplate { Model = model }, $"{GeneratedSourcesBaseFolder}Api\\I{model.MainClientName}{ImplementationFileExtension}");
         }
 
         protected virtual async Task GenerateModels(IEnumerable<CompositeType> modelTypes)

@@ -97,7 +97,9 @@ namespace AutoRest.CSharp.Model
             {
                 return versionedRoutes;
             }
-            return nonDeprecatedMethodsByClientName.Where(m => !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase));
+            return nonDeprecatedMethodsByClientName.Where(m => 
+                !m.Name.Equals("GetVersions", StringComparison.OrdinalIgnoreCase)
+                && !m.Name.Equals("GetStatus", StringComparison.OrdinalIgnoreCase));
 
         }
     }

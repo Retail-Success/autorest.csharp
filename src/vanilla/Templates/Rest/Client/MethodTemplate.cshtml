@@ -2,19 +2,7 @@
 @using AutoRest.CSharp.vanilla.Templates.Rest.Client
 @inherits AutoRest.Core.Template<AutoRest.CSharp.Model.MethodCs>
 
-[Obsolete]
-@(Model.AccessModifier) @(Model.OperationResponseReturnTypeString) @(Model.CorrectedName)(@(Model.GetAsyncMethodParameterDeclaration(false)))
-{
-	return @(Model.CorrectedName)Wrapper(@(Model.GetAsyncMethodInvocationArgs())).Result;
-}
-@EmptyLine
-private async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.CorrectedName)Wrapper(@(Model.GetAsyncMethodParameterDeclaration(false)))
-{
-	await new SynchronizationContextRemover();
-	return await @(Model.CorrectedName)Async(@(Model.GetAsyncMethodInvocationArgs()));
-}
-@EmptyLine
-@(Model.AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.CorrectedName)Async(@(Model.GetAsyncMethodParameterDeclaration(false)))
+@(Model.AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.CorrectedName)Async(@(Model.GetAsyncMethodParameterDeclaration(false, true)))
 {
 	@switch (Model.Flavor)
 	{
