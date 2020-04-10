@@ -43,7 +43,7 @@ foreach (ParameterCs parameter in Model.LocalParameters)
 @:/// </param>
 <text>
 @(Model.GetObsoleteAttribute())
-@((Model as MethodCs).AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodParameterDeclaration(true)))
+@((Model as MethodCs).AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodParameterDeclaration(true, false)))
 {
     // Send request
     @(Model.OperationResponseReturnTypeString) _response = await Begin@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false);
@@ -84,7 +84,7 @@ foreach (ParameterCs parameter in Model.LocalParameters)
 @:/// </param>
 <text>
 @(Model.GetObsoleteAttribute())
-@((Model as MethodCs).AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodParameterDeclaration(true)))
+@((Model as MethodCs).AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodParameterDeclaration(true, false)))
 {
     // Send Request
     @(Model.OperationResponseReturnTypeString) _response = await Begin@(Model.Name)WithHttpMessagesAsync(@(Model.GetAsyncMethodInvocationArgs())).ConfigureAwait(false);

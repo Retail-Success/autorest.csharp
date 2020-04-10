@@ -72,7 +72,7 @@ static readonly @(infoType) @(Model.Name)_RequestInfo =
 
 @EmptyLine
 public System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.Name)WithHttpMessagesAsync(
-    @(Model.GetAsyncMethodParameterDeclaration(true)))
+    @(Model.GetAsyncMethodParameterDeclaration(true, false)))
 {
     var params_ = new @(xns)AzureParam[]
     {
