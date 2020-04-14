@@ -2,7 +2,7 @@
 @using AutoRest.CSharp.vanilla.Templates.Rest.Client
 @inherits AutoRest.Core.Template<AutoRest.CSharp.Model.MethodCs>
 
-@(Model.AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.CorrectedName)Async(@(Model.GetAsyncMethodParameterDeclaration(false, true)))
+@(Model.AccessModifier) async System.Threading.Tasks.Task<@(Model.OperationResponseReturnTypeString)> @(Model.CorrectedName)(@(Model.GetAsyncMethodParameterDeclaration(false, true)))
 {
 	@switch (Model.Flavor)
 	{

@@ -28,7 +28,7 @@ namespace @(Settings.Namespace).Api
             continue;
         }
 
-        @:Task<@(method.OperationResponseReturnTypeString)> @(method.CorrectedName)Async(@(method.GetAsyncMethodParameterDeclaration(false, true)));
+        @:Task<@(method.OperationResponseReturnTypeString)> @(method.CorrectedName)(@(method.GetAsyncMethodParameterDeclaration(false, true)));
         @EmptyLine
         @:
     }

@@ -127,17 +127,22 @@ namespace AutoRest.CSharp.Model
         {
             get
             {
-                if (ReturnType.Body != null && ReturnType.Headers != null)
+                // autorest treats all documented return types as successful (even BadRequest and InternalServerError), so we'll just fix that
+                var successResponse = Responses[HttpStatusCode.OK];
+                if (successResponse != null)
                 {
-                    return $"{ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)},{ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}";
-                }
-                if (ReturnType.Body != null)
-                {
-                    return ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType);
-                }
-                if (ReturnType.Headers != null)
-                {
-                    return ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head);
+                    if (successResponse.Body != null && successResponse.Headers != null)
+                    {
+                        return $"{successResponse.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType)},{successResponse.Headers.AsNullableType(HttpMethod != HttpMethod.Head)}";
+                    }
+                    if (successResponse.Body != null)
+                    {
+                        return successResponse.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType);
+                    }
+                    if (successResponse.Headers != null)
+                    {
+                        return successResponse.Headers.AsNullableType(HttpMethod != HttpMethod.Head);
+                    }
                 }
 
                 return "Ok";
@@ -222,18 +227,21 @@ namespace AutoRest.CSharp.Model
         {
             get
             {
-                if (ReturnType.Body != null)
+                // autorest treats all documented return types as successful (even BadRequest and InternalServerError), so we'll just fix that
+                var successResponse = Responses[HttpStatusCode.OK];
+                if (successResponse != null)
                 {
-                    return ReturnType.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType);
+                    if (successResponse.Body != null)
+                    {
+                        return successResponse.Body.AsNullableType(HttpMethod != HttpMethod.Head && IsXNullableReturnType);
+                    }
+                    if (successResponse.Headers != null)
+                    {
+                        return successResponse.Headers.AsNullableType(HttpMethod != HttpMethod.Head);
+                    }
                 }
-                if (ReturnType.Headers != null)
-                {
-                    return ReturnType.Headers.AsNullableType(HttpMethod != HttpMethod.Head);
-                }
-                else
-                {
-                    return "void";
-                }
+
+                return "Ok";
             }
         }
 
@@ -462,8 +470,16 @@ namespace AutoRest.CSharp.Model
 	        }
         }
 
-        public string RequiredScope => Extensions.GetValue<string>("x-required-scope");
-        public string CorrectedName => Regex.Replace(Name, "V([0-9]+)$", "").TrimEnd('1');
+        public string RequiredScope => $"\"{Extensions.GetValue<string>("x-required-scope")}\"";
+        public string CorrectedName
+        {
+            get
+            {
+                var correctedName = Regex.Replace(Name, "V([0-9]+)$", "").TrimEnd('1');
+                return correctedName + (correctedName.EndsWith("Async", StringComparison.OrdinalIgnoreCase) ? "" : "Async");
+            }
+        }
+
         public string ClientName => Extensions.GetValue<string>("x-client-name");
 
 
