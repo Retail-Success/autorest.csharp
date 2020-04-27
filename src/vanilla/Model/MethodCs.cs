@@ -470,7 +470,19 @@ namespace AutoRest.CSharp.Model
 	        }
         }
 
-        public string RequiredScope => $"\"{Extensions.GetValue<string>("x-required-scope")}\"";
+        public string RequiredScope
+        {
+            get
+            {
+                var requiredScope = Extensions.GetValue<string>("x-required-scope");
+                if (string.IsNullOrEmpty(requiredScope))
+                {
+                    return "new string[0]";
+                }
+                return $"new []{{ \"{requiredScope}\" }}";
+            }
+        }
+
         public string CorrectedName
         {
             get
