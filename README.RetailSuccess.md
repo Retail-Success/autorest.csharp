@@ -25,3 +25,6 @@ note: you may have to comment out the code that pulls the latest version of the 
 ## publishing the docker image
 
 * see build-docker-image.ps1
+
+## Troubleshooting
+If you are experiencing compile errors in the test project, make sure you run `npm install` and see if that fixes your compile issues.

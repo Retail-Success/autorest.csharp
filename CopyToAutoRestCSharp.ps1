@@ -24,5 +24,11 @@ if (Test-Path "published") {
 	Remove-Item -path "published" -recurse
 }
 dotnet publish -o published
-Remove-Item -path "@microsoft.azure_autorest.csharp@2.3.82\node_modules\@microsoft.azure\autorest.csharp\src\bin\netcoreapp2.0\*" -recurse
+if (Test-Path "@microsoft.azure_autorest.csharp@2.3.82\node_modules\@microsoft.azure\autorest.csharp\src\bin\netcoreapp2.0") {
+	Remove-Item -path "@microsoft.azure_autorest.csharp@2.3.82\node_modules\@microsoft.azure\autorest.csharp\src\bin\netcoreapp2.0\*" -recurse
+}
+If (!(Test-Path "@microsoft.azure_autorest.csharp@2.3.82\node_modules\@microsoft.azure\autorest.csharp\src\bin\netcoreapp2.0\")) {
+    New-Item -Path "@microsoft.azure_autorest.csharp@2.3.82\node_modules\@microsoft.azure\autorest.csharp\src\bin\netcoreapp2.0\" -ItemType Directory
+}
+
 Copy-Item -Path "published\*" -Destination "@microsoft.azure_autorest.csharp@2.3.82\node_modules\@microsoft.azure\autorest.csharp\src\bin\netcoreapp2.0\" -Recurse
