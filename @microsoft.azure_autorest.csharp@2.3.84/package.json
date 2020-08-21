@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@microsoft.azure/autorest.csharp": "https://registry.npmjs.org/@microsoft.azure/autorest.csharp/-/autorest.csharp-2.3.84.tgz"
+  }
+}
