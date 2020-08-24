@@ -3,7 +3,7 @@
 ### one time setup
 
 * clone our fork of https://github.com/Azure/autorest.csharp
-* ```run 'autorest --csharp'``` so that autorest will install the autorest.csharp extension
+* ```run 'autorest --csharp --use=@microsoft.azure/autorest.csharp@2.3.82'``` so that autorest will install the autorest.csharp extension
 * copy the autorest.csharp extension folder into this folder (C:\Users\USER\.autorest\@microsoft.azure_autorest.csharp@2.3.82 => .\@microsoft.azure_autorest.csharp@2.3.82) -- note that docker may not be able to access it in the user folder
 
 ### putting the new code in the right places
