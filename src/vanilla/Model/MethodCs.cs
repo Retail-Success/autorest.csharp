@@ -108,13 +108,27 @@ namespace AutoRest.CSharp.Model
         {
             get
             {
-                return
-                    Parameters.Where(parameter =>
-                        parameter != null &&
-                        !parameter.IsClientProperty &&
-                        !string.IsNullOrWhiteSpace(parameter.Name) &&
-                        !parameter.IsConstant)
-                        .OrderBy(item => !item.IsRequired).Cast<ParameterCs>();
+                var methodParameters = Parameters
+                    .Where(
+                        p => p != null
+                             && !p.IsClientProperty
+                             && !string.IsNullOrWhiteSpace(p.Name)
+                             && !p.IsConstant
+                    )
+                    .ToList();
+
+                // this will only have value set when using Api.Core w/ swashbuckle v5 upgrade.
+                if (!string.IsNullOrWhiteSpace(RequestBodyParameterName))
+                {
+                    foreach (var mp in methodParameters.Where(mp => mp.Location == ParameterLocation.Body))
+                    {
+                        mp.Name = RequestBodyParameterName;
+                    }
+                }
+
+                return methodParameters
+                    .OrderBy(p => !p.IsRequired)
+                    .Cast<ParameterCs>();
             }
         }
 
@@ -494,6 +508,7 @@ namespace AutoRest.CSharp.Model
 
         public string ClientName => Extensions.GetValue<string>("x-client-name");
 
+        public string RequestBodyParameterName => Extensions.GetValue<string>("x-request-body-parameter-name");
 
         public string GetPostParameter(HttpMethod httpMethod)
         {
