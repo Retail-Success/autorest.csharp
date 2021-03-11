@@ -478,7 +478,7 @@ namespace AutoRest.CSharp.Model
                     // if we have a post with nothing being passed in the body, we are going to pass null to PutAsync in GetPostParameter,
                     //   so the type needs to be specified
                     return bodyParameter == null ? $"PutAsync<string, {ResponseReturnTypeString}>" : $"PutAsync<{bodyParameter.ModelTypeName}, {ResponseReturnTypeString}>";
-		        case HttpMethod.Delete: return $"DeleteAsync{genericType}";
+		        case HttpMethod.Delete: return $"DeleteAsync";
 		        default:
 			        throw new ArgumentException($"HttpMethod: {httpMethod} is not supported.");
 	        }
